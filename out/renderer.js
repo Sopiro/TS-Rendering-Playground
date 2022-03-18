@@ -1,3 +1,5 @@
+import { toAABB } from "./aabb.js";
+import { Box } from "./box.js";
 import { Vector2 } from "./math.js";
 import { Settings } from "./settings.js";
 export class Renderer {
@@ -83,5 +85,31 @@ export class Renderer {
     // Draw p1 to p2 vector
     drawVectorP(p1, p2, arrowSize = 0.03) {
         this.drawVector(p1, p2.sub(p1), arrowSize);
+    }
+    drawAABB(aabb, fillStyle = "#00000000", strokeStyle = "#000000") {
+        let vpcm = this.vpc.mulMatrix(this.modelTransform);
+        let tv0 = vpcm.mulVector2(aabb.min, 1);
+        let tv1 = vpcm.mulVector2(aabb.max, 1);
+        this.gfx.lineWidth = 1;
+        this.gfx.strokeStyle = strokeStyle;
+        this.gfx.fillStyle = fillStyle;
+        this.gfx.beginPath();
+        this.gfx.moveTo(tv0.x, Settings.height - tv0.y);
+        this.gfx.lineTo(tv1.x, Settings.height - tv0.y);
+        this.gfx.lineTo(tv1.x, Settings.height - tv1.y);
+        this.gfx.lineTo(tv0.x, Settings.height - tv1.y);
+        this.gfx.lineTo(tv0.x, Settings.height - tv0.y);
+        if (fillStyle != undefined)
+            this.gfx.fill();
+        this.gfx.stroke();
+        this.gfx.fillStyle = "#000000";
+    }
+    drawEntity(entity) {
+        if (entity instanceof Box) {
+            this.drawAABB(toAABB(entity), entity.color);
+        }
+        else {
+            throw "Not a supported shape";
+        }
     }
 }

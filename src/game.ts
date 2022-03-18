@@ -4,6 +4,11 @@ import * as Util from "./util.js";
 import { Renderer } from "./renderer.js";
 import { Camera } from "./camera.js";
 import { Settings } from "./settings.js";
+import { AABB, fix } from "./aabb.js";
+import { PRNG } from "./prng.js";
+import { Timer } from "./timer.js";
+import { Entity } from "./entity.js";
+import { toBox } from "./box.js";
 
 export class Game
 {
@@ -19,7 +24,17 @@ export class Game
     public time: number = 0.0;
     public frame: number = 0;
 
-    public callback = () => { };
+    private dragging: boolean = false;
+    private clickStart: Vector2 = new Vector2(0, 0);
+    private clickEnd: Vector2 = new Vector2(0, 0);
+
+    private blahBlahLabel: HTMLDivElement;
+    private seedTextBox: HTMLInputElement;
+
+    private timer: Timer = new Timer();
+    private rand: PRNG = new PRNG(0);
+
+    private entities: Entity[] = [];
 
     constructor(renderer: Renderer)
     {
@@ -34,6 +49,24 @@ export class Game
         let viewportTransform = Util.viewport(Settings.width, Settings.height);
 
         this.renderer.init(viewportTransform, projectionTransform, this.camera.cameraTransform);
+
+        const restartBtn = document.querySelector("#restart") as HTMLButtonElement;
+        restartBtn.addEventListener("click", () =>
+        {
+            this.init();
+        });
+
+        this.blahBlahLabel = document.querySelector("#blahBlah") as HTMLDivElement;
+        this.seedTextBox = document.querySelector("#seedTextBox") as HTMLInputElement;
+
+        this.init();
+    }
+
+    init(): void
+    {
+        // Initialization code here
+        this.camera.reset();
+        this.entities = [];
     }
 
     update(delta: number): void
@@ -42,10 +75,16 @@ export class Game
         this.frame++;
         this.time += delta;
         this.handleInput(delta);
-        this.callback();
+
+        // Update code here
+        let seedString = this.seedTextBox.value.length == 0 ? this.seedTextBox.placeholder : this.seedTextBox.value;
+        let seed = Util.stringHash(seedString);
+        this.rand.setSeed(seed);
+
+        this.blahBlahLabel.innerHTML = "Some text box: " + seed;
     }
 
-    private handleInput(delta: number)
+    private handleInput(delta: number): void
     {
         const mx = Input.isKeyDown("ArrowLeft") ? -1 : Input.isKeyDown("ArrowRight") ? 1 : 0;
         const my = Input.isKeyDown("ArrowDown") ? -1 : Input.isKeyDown("ArrowUp") ? 1 : 0;
@@ -68,13 +107,13 @@ export class Game
             }
         }
 
-        if (!this.cameraMove && Input.isMousePressed(2))
+        if (!this.cameraMove && Input.isMousePressed(Input.Button.Right))
         {
             this.cameraMove = true;
             this.cursorStart = Input.mousePosition.copy();
             this.cameraPosStart = this.camera.position.copy();
         }
-        else if (Input.isMouseReleased(2))
+        else if (Input.isMouseReleased(Input.Button.Right))
         {
             this.cameraMove = false;
         }
@@ -86,6 +125,38 @@ export class Game
             dist.y *= -(Settings.clipHeight / Settings.height) * this.camera.scale.y;
             this.camera.position = this.cameraPosStart.add(dist);
         }
+
+        if (Input.isKeyPressed("r"))
+        {
+            this.init();
+        }
+
+        if (Input.isMousePressed(Input.Button.Left))
+        {
+            if (!this.dragging)
+            {
+                this.dragging = true;
+                this.clickStart = this.renderer.pick(Input.mousePosition);
+            }
+        }
+
+        if (Input.isMouseDown(Input.Button.Left))
+        {
+            if (this.dragging)
+            {
+                this.clickEnd = this.renderer.pick(Input.mousePosition);
+            }
+        }
+
+        if (Input.isMouseReleased(Input.Button.Left))
+        {
+            if (this.dragging)
+            {
+                let box = toBox(new AABB(this.clickStart.copy(), this.clickEnd.copy()));
+                this.entities.push(box);
+                this.dragging = false;
+            }
+        }
     }
 
     render(r: Renderer): void
@@ -94,9 +165,16 @@ export class Game
         r.setModelTransform(new Matrix3());
 
         // Render code here
+        if (this.dragging)
+        {
+            r.drawAABB(new AABB(this.clickStart.copy(), this.clickEnd.copy()));
+        }
+
         r.drawLine(0, 0, 1, 1, 1);
         r.drawCircle(2, 2, 1);
         r.drawText(100, 100, "Hello renderer~");
         r.drawVector(new Vector2(-3, -3), new Vector2(0, 2));
+
+        this.entities.forEach(e => r.drawEntity(e));
     }
 }

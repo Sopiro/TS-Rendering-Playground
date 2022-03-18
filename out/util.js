@@ -28,36 +28,6 @@ export function clamp(value, min, max) {
 export function cross(scalar, vector) {
     return new Vector2(-scalar * vector.y, scalar * vector.x);
 }
-export function calculateBoxInertia(width, height, mass) {
-    return (width * width + height * height) * mass / 12.0;
-}
-export function calculateCircleInertia(radius, mass) {
-    return mass * radius * radius / 2.0;
-}
-// This function assumes the origin is the rotation axis
-export function calculateConvexPolygonInertia(vertices, mass, area = -1) {
-    let inertia = 0;
-    let count = vertices.length;
-    if (area <= 0) {
-        area = 0;
-        for (let i = 0; i < count; i++) {
-            let v1 = vertices[i];
-            let v2 = vertices[(i + 1) % count];
-            area += Math.abs(v1.cross(v2));
-        }
-        area *= 0.5;
-    }
-    for (let i = 0; i < count; i++) {
-        let v1 = vertices[i];
-        let v2 = vertices[(i + 1) % count];
-        let l1 = v1.length;
-        let l2 = v2.length;
-        let beta = Math.acos(v1.dot(v2) / (l1 * l2)) / 2;
-        let partialMass = (Math.abs(v1.cross(v2)) / 2.0) / area * mass;
-        inertia += 0.5 * partialMass * l1 * l2 * (1 - 2.0 / 3.0 * Math.sin(beta) * Math.sin(beta));
-    }
-    return inertia;
-}
 // Cantor pairing function, ((N, N) -> N) mapping function
 // https://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function
 export function make_pair_natural(a, b) {
@@ -112,3 +82,18 @@ export function assert(...test) {
         if (!test[i])
             throw new Error("Assertion failed");
 }
+export function hslString(h, s, l) {
+    return `hsl(${h}, ${s}%, ${l}%)`;
+}
+export function stringHash(s) {
+    let hash = 0, i, chr;
+    if (s.length === 0)
+        return hash;
+    for (i = 0; i < s.length; i++) {
+        chr = s.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
+;

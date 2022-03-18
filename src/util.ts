@@ -129,3 +129,24 @@ export function assert(...test: boolean[]): void
     for (let i = 0; i < test.length; i++)
         if (!test[i]) throw new Error("Assertion failed");
 }
+
+export function hslString(h: number, s: number, l: number): string
+{
+    return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+export function stringHash(s: string): number
+{
+    let hash = 0, i, chr;
+
+    if (s.length === 0) return hash;
+
+    for (i = 0; i < s.length; i++)
+    {
+        chr = s.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+
+    return hash;
+};

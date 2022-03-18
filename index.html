@@ -19,11 +19,82 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="title fs-1">TypeScript Rendering Playground</div>
-        <canvas id="canvas" style="border: 2px solid black; width: 1280px; height: 720px;"></canvas>
-        <div class="frame_counter fs-5">0fps</div>
-        <a href="https://github.com/Sopiro/TS-Rendering-Playground" class="fs-5">Source code</a>
+    <div class="container-fluid" style="max-width: 1700px;">
+        <div class="row">
+            <div class="col p-0" style="margin-left:1rem;">
+                <div class="row">
+                    <div class="col-10 title fs-1">TypeScript Rendering Playground</div>
+                    <div class="col align-self-end frame_counter fs-5 text-end">0fps</div>
+                </div>
+                <canvas id="canvas" style="border: 2px solid black; width: 1280px; height: 720px;"></canvas>
+            </div>
+
+            <div class="col fw-normal" style="margin: 4rem 1rem 1rem 1rem">
+                <div class="row mb-2">
+                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        How to use
+                    </button>
+                </div>
+
+                <!-- Shorcut modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">How to use</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body ms-2">
+                                <div class="row">
+                                    - Ecs to pause
+                                </div>
+                                <div class="row">
+                                    - Wheel to zoom in or out
+                                </div>
+                                <div class="row">
+                                    - Right click drag to move around
+                                </div>
+                                <div class="row">
+                                    - R to restart
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <button class="btn btn-primary" type="button" id="restart">
+                        Restart
+                    </button>
+                </div>
+
+                <div class="row">
+                    <label for="seed" class="form-label col-9 p-0 m-0">Seed</label>
+                    <input type="text" class="form-control" aria-label="seed" placeholder="오영택" value="우왁굳" id="seedTextBox">
+                </div>
+
+                <br>
+                <div class="row">
+                    <label for="range" class="form-label col-9 p-0 m-0">Some range</label>
+                    <div class="col text-end p-0 m-0" id="rangelabel">0ms</div>
+                    <input type="range" class="form-range " id="range">
+                </div>
+                <div class="row">
+                    <div class="form-check form-switch m-0">
+                        <label class="form-check-label" for="check">Some check</label>
+                        <input class="form-check-input " type="checkbox" role="switch" id="check">
+                    </div>
+                </div>
+                <div class="row" id="blahBlah" style="font-size: 1.1rem;">
+                </div>
+                <div class="row" style="font-size: 1.1rem;">
+                    <a href="https://github.com/Sopiro/TS-Rendering-Playground" class="p-0">Source</a>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 
